@@ -456,7 +456,7 @@
     .message-sparkle {
       position: absolute;
       opacity: 0;
-      animation: sparkleFlash 1s ease-in-out 3;
+      animation: sparkleFlash 1.6s ease-in-out infinite;
       filter: drop-shadow(0 0 10px rgba(255,255,255,0.9));
       text-shadow:
         0 0 6px rgba(255,255,255,0.95),
@@ -550,7 +550,7 @@
         <div class="slider">
           <div class="slide active">
             <div class="photo-frame">
-              <img class="photo" src="jupri1.jpg" alt="jupri1" style="object-position: center top;">
+              <img class="photo" src="jupri1.jpg" alt="jupri1" style="object-position: center center;">
             </div>
             <h3>Nosso amor para sempre</h3>
             <div class="caption" data-text="Desde o primeiro instante, meu coração soube que você seria especial na minha vida."></div>
@@ -772,10 +772,6 @@ Com amor, Junior Oliveira`;
         el.style.animationDelay = (Math.random() * 0.25) + 's';
         layer.appendChild(el);
       });
-
-      setTimeout(() => {
-        layer.innerHTML = '';
-      }, 3000);
     }
 
     function typeText(element, text, speed = 42) {
