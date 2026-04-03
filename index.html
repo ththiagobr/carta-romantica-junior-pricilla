@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>❤️ Uma Carta Para Você ❤️</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg1: #fff5f8;
+      --bg2: #ffe7ef;
+      --rose: #d85b86;
+      --rose-dark: #a73b61;
+      --text: #442634;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.9), transparent 30%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x: hidden;
+    }
+
+    .floating {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .float-item {
+      position: absolute;
+      bottom: -50px;
+      opacity: 0;
+      animation: rise linear infinite;
+      filter: blur(.1px);
+    }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scale(.8) rotate(0deg); opacity: 0; }
+      15% { opacity: .7; }
+      100% { transform: translateY(-120vh) scale(1.2) rotate(18deg); opacity: 0; }
+    }
+
+    .burst {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      overflow: hidden;
+    }
+
+    .burst-heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 20px;
+      opacity: 0;
+      animation: burstFly 1.8s ease-out forwards;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 6px 12px rgba(216,91,134,0.18));
+    }
+
+    @keyframes burstFly {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+      12% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.25) rotate(var(--r));
+      }
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.42), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(216,91,134,0.08), transparent 28%);
+      pointer-events: none;
+    }
+
+    .glass {
+      width: 100%;
+      max-width: 920px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,250,252,0.72));
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.72);
+      border-radius: 34px;
+      box-shadow: 0 30px 90px rgba(130, 45, 75, 0.16);
+      padding: 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    h1 { font-size: 2.4rem; }
+    h2 { font-size: 1.8rem; }
+
+    p {
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      opacity: .86;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+      color: white;
+      font-size: 1rem;
+      padding: 14px 24px;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(168, 52, 95, 0.22);
+      transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease;
+      font-family: inherit;
+      letter-spacing: .2px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 18px 34px rgba(168, 52, 95, 0.24);
+    }
+
+    .hidden { display: none !important; }
+
+    .cover {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      animation: fadeUp 1s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .envelope-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 8px 0 14px;
+      min-height: 280px;
+    }
+
+    .envelope {
+      width: 300px;
+      height: 205px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .envelope-back, .envelope-front, .letter, .flap {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .envelope-back {
+      height: 100%;
+      background: linear-gradient(180deg, #f9d7e4, #f3bfd1);
+      box-shadow: 0 20px 40px rgba(145, 55, 88, 0.18);
+      overflow: hidden;
+    }
+
+    .flap {
+      top: 0;
+      height: 150px;
+      background: linear-gradient(180deg, #efadc3, #e58dad);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transition: transform 1s ease;
+      z-index: 4;
+    }
+
+    .letter {
+      width: 86%;
+      left: 7%;
+      top: 28px;
+      height: 170px;
+      background: #fffafc;
+      border-radius: 14px;
+      padding: 20px 16px;
+      z-index: 2;
+      transition: transform 1.1s ease;
+      box-shadow: 0 10px 25px rgba(120, 40, 70, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .letter strong { font-size: 1.25rem; }
+    .letter small { margin-top: 8px; opacity: .75; }
+
+    .envelope-front {
+      bottom: 0;
+      height: 110px;
+      background: linear-gradient(180deg, #efbfd0, #e9a9c0);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      z-index: 5;
+    }
+
+    .envelope.open .flap {
+      transform: rotateX(180deg);
+    }
+
+    .envelope.open .letter {
+      transform: translateY(-105px);
+    }
+
+    .experience {
+      animation: fadeUp 1s ease;
+    }
+
+    .story-title {
+      margin-bottom: 10px;
+      letter-spacing: .2px;
+    }
+
+    .slider {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px;
+      margin-top: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,247,250,.92));
+      border: 1px solid rgba(255,255,255,.7);
+      min-height: 620px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 18px 50px rgba(126, 56, 82, 0.08);
+    }
+
+    .slide {
+      display: none;
+      padding: 20px;
+      animation: fadeUp .8s ease;
+    }
+
+    .slide.active { display: block; }
+
+    .photo-frame {
+      padding: 12px;
+      background: linear-gradient(180deg, #fff, #fff8fb);
+      border-radius: 26px;
+      box-shadow: 0 16px 40px rgba(126, 56, 82, 0.10);
+      margin-bottom: 18px;
+      border: 1px solid rgba(244, 218, 228, 0.9);
+    }
+
+    .photo {
+      display: block;
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      border-radius: 20px;
+      background: #f7dfe7;
+    }
+
+    .slide h3 {
+      margin: 8px 0 12px;
+      color: var(--rose-dark);
+      font-size: 1.45rem;
+    }
+
+    .caption {
+      font-size: 1.16rem;
+      padding: 0 12px 10px;
+      max-width: 700px;
+      margin: 0 auto;
+      color: var(--rose);
+      font-weight: 600;
+      min-height: 64px;
+      line-height: 1.8;
+    }
+
+    .caption.typing::after {
+      content: '|';
+      display: inline-block;
+      margin-left: 4px;
+      animation: blinkCursor .8s infinite;
+      color: var(--rose-dark);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #edb5c8;
+      transition: transform .2s ease;
+    }
+
+    .dot.active {
+      background: var(--rose);
+      transform: scale(1.15);
+    }
+
+    .music-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .music-btn {
+      border: 1px solid rgba(216,91,134,0.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      color: var(--rose-dark);
+      font-size: .95rem;
+      padding: 10px 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(126, 56, 82, 0.08);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      font-family: inherit;
+    }
+
+    .music-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(126, 56, 82, 0.10);
+      background: rgba(255,255,255,0.96);
+    }
+
+    .floating-music {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.7);
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,246,250,0.96));
+      box-shadow: 0 14px 30px rgba(126,56,82,0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--rose-dark);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .floating-music:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 18px 36px rgba(126,56,82,0.2);
+    }
+
+    .floating-music.is-playing {
+      animation: pulseMusic 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseMusic {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .tip {
+      margin-top: 12px;
+      font-size: .93rem;
+      opacity: .78;
+    }
+
+    .typewriter-box {
+      display: none;
+      min-height: 560px;
+      padding: 34px 26px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      animation: fadeUp .8s ease;
+      position: relative;
+    }
+
+    .typewriter-box.show {
+      display: flex;
+    }
+
+    .typewriter-content {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .typewriter-title {
+      color: var(--rose-dark);
+      font-size: 2rem;
+      margin-bottom: 24px;
+    }
+
+    .typewriter-text {
+      font-size: 1.24rem;
+      line-height: 1.95;
+      white-space: pre-line;
+    }
+
+    .type-cursor {
+      display: inline-block;
+      margin-left: 3px;
+      animation: blinkCursor .8s infinite;
+    }
+
+    .message-sparkles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .message-sparkle {
+      position: absolute;
+      opacity: 0;
+      animation: sparkleFlash 1s ease-in-out 3;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.9));
+      text-shadow:
+        0 0 6px rgba(255,255,255,0.95),
+        0 0 14px rgba(255,215,235,0.95),
+        0 0 24px rgba(216,91,134,0.45);
+    }
+
+    @keyframes sparkleFlash {
+      0% { opacity: 0; transform: scale(.4) rotate(0deg); }
+      20% { opacity: 1; transform: scale(1.2) rotate(10deg); }
+      50% { opacity: .55; transform: scale(.9) rotate(-8deg); }
+      80% { opacity: 1; transform: scale(1.15) rotate(8deg); }
+      100% { opacity: 0; transform: scale(.55) rotate(0deg); }
+    }
+
+    @keyframes blinkCursor {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.55rem; }
+      .glass { padding: 18px; }
+      .envelope { width: 260px; height: 180px; }
+      .envelope.open .letter { transform: translateY(-90px); }
+      .slider { min-height: 540px; }
+      .photo { height: 260px; }
+      .typewriter-box {
+        min-height: 500px;
+        padding: 24px 18px;
+      }
+      .typewriter-title {
+        font-size: 1.65rem;
+      }
+      .typewriter-text {
+        font-size: 1.06rem;
+        line-height: 1.82;
+      }
+      .caption {
+        font-size: 1.02rem;
+        min-height: 74px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating" id="floating"></div>
+  <div class="burst" id="burst"></div>
+
+  <audio id="bgMusic" preload="auto"></audio>
+  <button class="floating-music" id="floatingMusicBtn" onclick="toggleMusic()" aria-label="Controlar música">🎵</button>
+
+  <main class="wrap">
+    <section class="glass">
+      <div class="cover" id="cover">
+        <div>
+          <h1>Uma surpresa para <span id="personName">Pricilla Ferraz</span> ❤️</h1>
+          <p class="subtitle">
+            Tem uma carta esperando para ser aberta, guardando um pedacinho bonito do que eu sinto por você.
+          </p>
+        </div>
+
+        <div class="envelope-area">
+          <div class="envelope" id="envelope" onclick="openLetter()">
+            <div class="envelope-back"></div>
+            <div class="flap"></div>
+            <div class="letter">
+              <strong>Para <span id="letterTo">Pricilla Ferraz</span></strong>
+              <small>Toque para abrir</small>
+            </div>
+            <div class="envelope-front"></div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="openLetter()">Abrir carta</button>
+        <p class="tip">Tem uma carta muito especial, escrita com todo o meu amor, saindo direto do meu coração para chegar até você. ❤️</p>
+      </div>
+
+      <div class="experience hidden" id="experience">
+        <h2 class="story-title">De <span id="fromName">Junior Oliveira</span> para <span id="toName">Pricilla Ferraz</span> ✨</h2>
+        <p>
+          Algumas lembranças, sentimentos e pequenos instantes que mereciam um lugar bonito só para nós.
+        </p>
+
+        <div class="slider">
+          <div class="slide active">
+            <div class="photo-frame">
+              <img class="photo" src="jupri1.jpg" alt="jupri1" style="object-position: center top;">
+            </div>
+            <h3>Nosso amor para sempre</h3>
+            <div class="caption" data-text="Desde o primeiro instante, meu coração soube que você seria especial na minha vida."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri2.jpg" alt="jupri2">
+            </div>
+            <h3>Seu sorriso</h3>
+            <div class="caption" data-text="Seu sorriso ilumina meus dias e transforma qualquer momento em felicidade."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri3.jpg" alt="jupri3">
+            </div>
+            <h3>Meu lugar favorito</h3>
+            <div class="caption" data-text="Estar ao seu lado é como encontrar paz, carinho e amor no mesmo abraço."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri4.jpg" alt="jupri4">
+            </div>
+            <h3>Nossa história</h3>
+            <div class="caption" data-text="Cada capítulo ao seu lado deixa a minha vida mais bonita, leve e cheia de sentido."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri5.jpg" alt="jupri5">
+            </div>
+            <h3>Momentos eternos</h3>
+            <div class="caption" data-text="Com você, até os instantes mais simples viram memórias que eu quero guardar para sempre."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri6.jpg" alt="jupri6">
+            </div>
+            <h3>Amor que cresce</h3>
+            <div class="caption" data-text="A cada dia que passa, eu descubro novos motivos para te amar ainda mais."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri7.jpg" alt="jupri7">
+            </div>
+            <h3>Sonho lindo</h3>
+            <div class="caption" data-text="Você é aquele sonho bonito que a vida transformou na minha mais doce realidade."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri8.jpg" alt="jupri8">
+            </div>
+            <h3>Meu coração</h3>
+            <div class="caption" data-text="Meu coração encontra o ritmo mais bonito quando está perto do seu."></div>
+          </div>
+
+          <div class="slide">
+            <div class="photo-frame">
+              <img class="photo" src="jupri9.jpg" alt="jupri9">
+            </div>
+            <h3>Para sempre nós</h3>
+            <div class="caption" data-text="Tudo fica mais bonito quando penso no presente que é ter você comigo."></div>
+          </div>
+
+          <div class="typewriter-box" id="typewriterBox">
+            <div class="message-sparkles" id="messageSparkles"></div>
+            <div class="typewriter-content">
+              <h3 class="typewriter-title">Mensagem final 💌</h3>
+              <div class="typewriter-text" id="typewriterText"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dots" id="dots"></div>
+
+        <div class="controls">
+          <button class="btn" onclick="prevSlide()">Voltar</button>
+          <button class="btn" onclick="nextSlide()">Próximo</button>
+        </div>
+
+        <div class="music-controls">
+          <button class="music-btn" onclick="toggleMusic()" id="musicToggleBtn">Tocar música</button>
+          <button class="music-btn" onclick="restartMusic()">Recomeçar música</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dotsWrap = document.getElementById('dots');
+    const photoSlides = slides.slice(0, 9);
+    const finalMessage = `Isso é só uma pequena forma de te lembrar que você é muito especial para mim.
+Em cada detalhe, em cada lembrança, em cada sentimento bonito… tem você.
+
+Obrigado por existir, por ser essa pessoa incrível e por deixar a minha vida mais leve, mais doce e mais feliz.
+
+Com amor, Junior Oliveira`;
+
+    let current = 0;
+    let autoSlide;
+    let started = false;
+    let fadeInterval = null;
+    let completedLoops = 0;
+    let showingFinalMessage = false;
+    let typeInterval = null;
+    let captionInterval = null;
+
+    photoSlides.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (index === 0 ? ' active' : '');
+      dotsWrap.appendChild(dot);
+    });
+
+    function typeCaption(slide) {
+      clearInterval(captionInterval);
+      const captionEl = slide.querySelector('.caption');
+      if (!captionEl) return;
+
+      const text = captionEl.dataset.text || '';
+      let i = 0;
+      captionEl.textContent = '';
+      captionEl.classList.add('typing');
+
+      captionInterval = setInterval(() => {
+        captionEl.textContent = text.slice(0, i);
+        i++;
+
+        if (i > text.length) {
+          clearInterval(captionInterval);
+          captionEl.textContent = text;
+          captionEl.classList.remove('typing');
+        }
+      }, 34);
+    }
+
+    function renderSlides() {
+      photoSlides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === current);
+      });
+      document.querySelectorAll('.dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === current);
+      });
+      typeCaption(photoSlides[current]);
+    }
+
+    function nextSlide() {
+      if (showingFinalMessage) return;
+
+      const previous = current;
+      current = (current + 1) % photoSlides.length;
+
+      if (previous === photoSlides.length - 1 && current === 0) {
+        completedLoops++;
+      }
+
+      if (completedLoops >= 2) {
+        showFinalTypedMessage();
+        return;
+      }
+
+      renderSlides();
+    }
+
+    function prevSlide() {
+      if (showingFinalMessage) return;
+      current = (current - 1 + photoSlides.length) % photoSlides.length;
+      renderSlides();
+    }
+
+    function showFinalTypedMessage() {
+      showingFinalMessage = true;
+      clearInterval(autoSlide);
+      clearInterval(captionInterval);
+
+      photoSlides.forEach(slide => slide.classList.remove('active'));
+      document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+
+      const box = document.getElementById('typewriterBox');
+      const textEl = document.getElementById('typewriterText');
+
+      box.classList.add('show');
+      triggerMessageSparkles();
+      typeText(textEl, finalMessage, 42);
+    }
+
+    function triggerMessageSparkles() {
+      const layer = document.getElementById('messageSparkles');
+      layer.innerHTML = '';
+
+      const symbols = ['✨', '⭐', '❤', '💖', '✦', '💫'];
+      const positions = [
+        { left: '12%', top: '18%' },
+        { left: '24%', top: '32%' },
+        { left: '78%', top: '20%' },
+        { left: '68%', top: '34%' },
+        { left: '16%', top: '64%' },
+        { left: '30%', top: '78%' },
+        { left: '72%', top: '66%' },
+        { left: '84%', top: '76%' },
+        { left: '50%', top: '16%' },
+        { left: '52%', top: '82%' },
+        { left: '8%', top: '46%' },
+        { left: '90%', top: '48%' }
+      ];
+
+      positions.forEach((pos, index) => {
+        const el = document.createElement('div');
+        el.className = 'message-sparkle';
+        el.textContent = symbols[index % symbols.length];
+        el.style.left = pos.left;
+        el.style.top = pos.top;
+        el.style.fontSize = (18 + Math.random() * 18) + 'px';
+        el.style.animationDelay = (Math.random() * 0.25) + 's';
+        layer.appendChild(el);
+      });
+
+      setTimeout(() => {
+        layer.innerHTML = '';
+      }, 3000);
+    }
+
+    function typeText(element, text, speed = 42) {
+      clearInterval(typeInterval);
+      let i = 0;
+      element.innerHTML = '<span class="type-cursor">|</span>';
+
+      typeInterval = setInterval(() => {
+        const visibleText = text.slice(0, i).replace(/\n/g, '<br>');
+        element.innerHTML = visibleText + '<span class="type-cursor">|</span>';
+        i++;
+
+        if (i > text.length) {
+          clearInterval(typeInterval);
+          element.innerHTML = text.replace(/\n/g, '<br>');
+        }
+      }, speed);
+    }
+
+    function createHeartBurst() {
+      const burst = document.getElementById('burst');
+      for (let i = 0; i < 26; i++) {
+        const el = document.createElement('div');
+        el.className = 'burst-heart';
+        el.textContent = Math.random() > 0.18 ? '❤' : '✦';
+        el.style.setProperty('--x', ((Math.random() * 320) - 160) + 'px');
+        el.style.setProperty('--y', ((Math.random() * 240) - 180) + 'px');
+        el.style.setProperty('--r', ((Math.random() * 80) - 40) + 'deg');
+        el.style.fontSize = (14 + Math.random() * 18) + 'px';
+        burst.appendChild(el);
+        setTimeout(() => el.remove(), 1900);
+      }
+    }
+
+    function loadTrack() {
+      const music = document.getElementById('bgMusic');
+      music.src = 'Ed-photo.mp3';
+      music.pause();
+      music.load();
+    }
+
+    function fadeInMusic(targetVolume = 0.45, duration = 1800) {
+      const music = document.getElementById('bgMusic');
+      clearInterval(fadeInterval);
+      music.volume = 0.02;
+      const steps = 18;
+      const stepTime = Math.floor(duration / steps);
+      const increment = (targetVolume - music.volume) / steps;
+
+      fadeInterval = setInterval(() => {
+        const nextVolume = Math.min(targetVolume, music.volume + increment);
+        music.volume = Number(nextVolume.toFixed(3));
+        if (music.volume >= targetVolume) {
+          clearInterval(fadeInterval);
+        }
+      }, stepTime);
+    }
+
+    function startMusic(forcePlay = false) {
+      const music = document.getElementById('bgMusic');
+      if (!music.src) loadTrack();
+
+      const playPromise = music.play();
+
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.then(() => {
+          fadeInMusic();
+          updateMusicButton();
+        }).catch(() => {
+          if (forcePlay) updateMusicButton('Tocar música');
+        });
+      } else {
+        fadeInMusic();
+        updateMusicButton();
+      }
+    }
+
+    function toggleMusic() {
+      const music = document.getElementById('bgMusic');
+      if (!music.src) loadTrack();
+
+      if (music.paused) {
+        startMusic(true);
+      } else {
+        music.pause();
+        clearInterval(fadeInterval);
+        updateMusicButton();
+      }
+    }
+
+    function restartMusic() {
+      const music = document.getElementById('bgMusic');
+      if (!music.src) loadTrack();
+      music.currentTime = 0;
+      startMusic(true);
+    }
+
+    function updateMusicButton(forcedLabel) {
+      const music = document.getElementById('bgMusic');
+      const btn = document.getElementById('musicToggleBtn');
+      const floatingBtn = document.getElementById('floatingMusicBtn');
+      const label = forcedLabel || (music.paused ? 'Tocar música' : 'Pausar música');
+
+      btn.textContent = label;
+      floatingBtn.classList.toggle('is-playing', !music.paused);
+      floatingBtn.textContent = music.paused ? '🎵' : '🎶';
+      floatingBtn.setAttribute('aria-label', label);
+    }
+
+    function openLetter() {
+      if (started) return;
+      started = true;
+      document.getElementById('envelope').classList.add('open');
+      createHeartBurst();
+      startMusic(true);
+
+      setTimeout(() => {
+        document.getElementById('cover').classList.add('hidden');
+        document.getElementById('experience').classList.remove('hidden');
+        renderSlides();
+        autoSlide = setInterval(nextSlide, 5200);
+      }, 1300);
+    }
+
+    const floating = document.getElementById('floating');
+    for (let i = 0; i < 48; i++) {
+      const el = document.createElement('div');
+      el.className = 'float-item';
+      el.textContent = Math.random() > 0.12 ? '❤' : '✦';
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.fontSize = (12 + Math.random() * 20) + 'px';
+      el.style.animationDuration = (5 + Math.random() * 7) + 's';
+      el.style.animationDelay = (Math.random() * 6) + 's';
+      floating.appendChild(el);
+    }
+
+    const from = 'Junior Oliveira';
+    const to = 'Pricilla Ferraz';
+
+    loadTrack();
+
+    const musicElement = document.getElementById('bgMusic');
+    musicElement.addEventListener('pause', () => updateMusicButton());
+    musicElement.addEventListener('play', () => updateMusicButton());
+    updateMusicButton();
+
+    document.getElementById('personName').textContent = to;
+    document.getElementById('letterTo').textContent = to;
+    document.getElementById('fromName').textContent = from;
+    document.getElementById('toName').textContent = to;
+  </script>
+</body>
+</html>
